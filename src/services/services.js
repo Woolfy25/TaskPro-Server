@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./schemas/Users");
-const Meals = require("./schemas/Meals");
+const Boards = require("./schemas/Board");
 const jwt = require("jsonwebtoken");
 const nanoid = require("nanoid");
 const nodemailer = require("nodemailer");
@@ -11,238 +11,201 @@ const pass = process.env.PASS;
 
 // * Done
 const logOutAccount = async (userId) => {
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new Error("Not Authorized!");
-    }
-    user.token = null;
-    await user.save();
-
-    return userId;
-  } catch (error) {
-    throw error;
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("Not Authorized!");
   }
+  user.token = null;
+  await user.save();
+
+  return userId;
 };
 
 // * Done
 const createAccount = async ({ email, name, password }) => {
-  try {
-    const userExistent = await User.findOne({ email });
-    if (userExistent) {
-      throw new Error("This email already exists!");
-    }
-
-    const uniqueValidationCode = nanoid(); // uniqueValidationCode
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "ramonspuci@gmail.com",
-        pass: pass,
-      },
-    });
-
-    const mailOptions = {
-      from: "ramonspuci@gmail.com",
-      to: `${email}`,
-      subject: "Verification email Slim Mom account.",
-      text: `Your account verification code is: ${uniqueValidationCode}, http://localhost:3000/health/account/verify/${uniqueValidationCode}`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return console.log(error);
-      }
-      console.log("Email sent: " + info.response);
-    });
-
-    const newUser = User({
-      email,
-      name,
-      verificationToken: uniqueValidationCode,
-    });
-    newUser.setPassword(password);
-
-    const savedUser = await newUser.save();
-
-    const token = jwt.sign(
-      {
-        _id: savedUser._id,
-        email: savedUser.email,
-        name: savedUser.name,
-      },
-      secret,
-      { expiresIn: "1h" }
-    );
-    savedUser.token = token;
-
-    return await savedUser.save();
-  } catch (error) {
-    throw error;
+  const userExistent = await User.findOne({ email });
+  if (userExistent) {
+    throw new Error("This email already exists!");
   }
+
+  const uniqueValidationCode = nanoid();
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "ramonspuci@gmail.com",
+      pass: pass,
+    },
+  });
+
+  const mailOptions = {
+    from: "ramonspuci@gmail.com",
+    to: `${email}`,
+    subject: "Verification email Task Pro account.",
+    text: `Your account verification code is: ${uniqueValidationCode}, http://localhost:3000/taskpro/account/verify/${uniqueValidationCode}`, // ! change to website URL
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log("Email sent: " + info.response);
+  });
+
+  const newUser = User({
+    email,
+    name,
+    verificationToken: uniqueValidationCode,
+  });
+  newUser.setPassword(password);
+
+  const savedUser = await newUser.save();
+
+  const token = jwt.sign(
+    {
+      _id: savedUser._id,
+      email: savedUser.email,
+      name: savedUser.name,
+      theme: savedUser.theme,
+      picture: savedUser.picture,
+    },
+    secret,
+    { expiresIn: "5h" }
+  );
+  savedUser.token = token;
+
+  return await savedUser.save();
 };
 
 // * Done
 const checkUserDB = async ({ email, password }) => {
-  try {
-    const user = await User.findOne({ email });
-    if (!user || !user.validPassword(password)) {
-      throw new Error("Email or password is wrong!");
-    }
-
-    if (!user.verify) {
-      throw new Error("You have to verify your account first!");
-    }
-
-    const token = jwt.sign(
-      { _id: user._id, email: user.email, name: user.name },
-      secret,
-      {
-        expiresIn: "1h",
-      }
-    );
-    user.token = token;
-
-    return await user.save();
-  } catch (error) {
-    throw error;
+  const user = await User.findOne({ email });
+  if (!user || !user.validPassword(password)) {
+    throw new Error("Email or password is wrong!");
   }
+
+  if (!user.verify) {
+    throw new Error("You have to verify your account first!");
+  }
+
+  const token = jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      theme: user.theme,
+      picture: user.picture,
+    },
+    secret,
+    {
+      expiresIn: "1h",
+    }
+  );
+  user.token = token;
+
+  return await user.save();
 };
 
 // * Done
 const updateAccount = async (accountId, updatedData) => {
-  try {
-    return await User.findByIdAndUpdate(
-      accountId,
-      { $set: updatedData },
-      { new: true }
-    );
-  } catch (error) {
-    throw error;
-  }
-};
-
-// * Done
-const getIngredients = async () => {
-  try {
-    const db = mongoose.connection.db;
-    const collection = db.collection("ingredients");
-    return await collection.find().toArray();
-  } catch (error) {
-    throw error;
-  }
+  return await User.findByIdAndUpdate(
+    accountId,
+    { $set: updatedData },
+    { new: true }
+  );
 };
 
 // * Done
 const deleteAccount = async (accountId) => {
-  try {
-    return User.deleteOne({ _id: accountId });
-  } catch (error) {
-    throw error;
-  }
+  return User.deleteOne({ _id: accountId });
+};
+
+// TODO Working
+const getAllTasks = async (ownerId) => {
+  return Boards.find({ owner: ownerId });
 };
 
 // * Done
-const getAllMeals = async (ownerId) => {
-  try {
-    return Meals.find({ owner: ownerId });
-  } catch (error) {
-    throw error;
-  }
+const addBoard = async ({ title, icon, background, ownerId }) => {
+  const board = new Boards({
+    title,
+    icon,
+    background,
+    owner: ownerId,
+  });
+  await board.save();
+
+  return board;
 };
 
 // * Done
-const addMeals = async ({ product, weight, calories, date, ownerId }) => {
-  try {
-    const meals = new Meals({
-      product,
-      weight,
-      calories,
-      date,
-      owner: ownerId,
-    });
-    await meals.save();
-
-    return meals;
-  } catch (error) {
-    throw error;
-  }
+const updateBoard = async (boardId, updatedData) => {
+  return await Boards.findByIdAndUpdate(
+    boardId,
+    { $set: updatedData },
+    { new: true }
+  );
 };
 
 // * Done
-const deleteMeal = async (mealId, ownerId) => {
-  try {
-    const deletedContact = await Meals.deleteOne({
-      _id: mealId,
-      owner: ownerId,
-    });
+const deleteBoard = async (boardId, ownerId) => {
+  const deletedBoard = await Boards.deleteOne({
+    _id: boardId,
+    owner: ownerId,
+  });
 
-    if (deletedContact.deletedCount === 0) {
-      throw new Error(
-        "Contact not found or you don't have permission to delete"
-      );
-    }
-
-    return deletedContact;
-  } catch (error) {
-    throw error;
+  if (deletedBoard.deletedCount === 0) {
+    throw new Error("Contact not found or you don't have permission to delete");
   }
+
+  return deletedBoard;
 };
 
 // * Done
 const verifyEmailAddress = async (verificationToken) => {
-  try {
-    const update = { verify: true, verificationToken: null };
+  const update = { verify: true, verificationToken: null };
 
-    const result = await User.findOneAndUpdate(
-      {
-        verificationToken: verificationToken,
-      },
-      { $set: update },
-      { new: true }
-    );
+  const result = await User.findOneAndUpdate(
+    {
+      verificationToken: verificationToken,
+    },
+    { $set: update },
+    { new: true }
+  );
 
-    if (!result) throw new Error("User does not exist!");
-  } catch (error) {
-    throw error;
-  }
+  if (!result) throw new Error("User does not exist!");
 };
 
 // * Done
 const verifyEmailResend = async (email) => {
-  try {
-    const user = await User.findOne({ email });
-    if (!user) throw new Error("User does not exist!");
-    if (user.verify === true)
-      throw new Error("Verification has already been passed!");
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("User does not exist!");
+  if (user.verify === true)
+    throw new Error("Verification has already been passed!");
 
-    const uniqueValidationCode = user.verificationToken;
+  const uniqueValidationCode = user.verificationToken;
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "ramonspuci@gmail.com",
-        pass: pass,
-      },
-    });
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "ramonspuci@gmail.com",
+      pass: pass,
+    },
+  });
 
-    const mailOptions = {
-      from: "ramonspuci@gmail.com",
-      to: `${email}`,
-      subject: "Verification email Slim Mom account",
-      text: `Your account verification code is ${uniqueValidationCode}, http://localhost:3000/health/account/verify/${uniqueValidationCode}`,
-    };
+  const mailOptions = {
+    from: "ramonspuci@gmail.com",
+    to: `${email}`,
+    subject: "Verification email Task Pro account.",
+    text: `Your account verification code is: ${uniqueValidationCode}, http://localhost:3000/taskpro/account/verify/${uniqueValidationCode}`, // ! change to website URL
+  };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return console.log(error);
-      }
-      console.log("Email sent: " + info.response);
-    });
-  } catch (error) {
-    throw error;
-  }
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log("Email sent: " + info.response);
+  });
 };
 
 module.exports = {
@@ -253,8 +216,8 @@ module.exports = {
   deleteAccount,
   verifyEmailAddress,
   verifyEmailResend,
-  getIngredients,
-  getAllMeals,
-  addMeals,
-  deleteMeal,
+  getAllTasks,
+  addBoard,
+  updateBoard,
+  deleteBoard,
 };

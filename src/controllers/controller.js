@@ -4,11 +4,11 @@ require("dotenv").config();
 // * Done
 const getCurrentUser = async (req, res, next) => {
   try {
-    const { _id, email, name, height, calories, age, bloodType } = req.user;
+    const { _id, email, name, theme, picture } = req.user;
     res.status(200).json({
       status: "Success",
       code: 200,
-      data: { _id, email, name, height, calories, age, bloodType },
+      data: { _id, email, name, theme, picture },
     });
   } catch (error) {
     res.status(404).json({
@@ -49,7 +49,12 @@ const createAccount = async (req, res, next) => {
       status: "Success",
       code: 201,
       data: {
-        user: { name: result.name, email: result.email },
+        user: {
+          name: result.name,
+          email: result.email,
+          theme: result.theme,
+          picture: result.picture,
+        },
         token: result.token,
       },
     });
@@ -74,7 +79,12 @@ const loginAccount = async (req, res, next) => {
       status: "Success",
       code: 201,
       data: {
-        user: { name: result.name, email: result.email },
+        user: {
+          name: result.name,
+          email: result.email,
+          theme: result.theme,
+          picture: result.picture,
+        },
         token: result.token,
       },
     });
@@ -99,32 +109,13 @@ const updateAccount = async (req, res, next) => {
       data: {
         name: result.name,
         email: result.email,
-        height: result.height,
-        calories: result.calories,
-        age: result.age,
-        bloodType: result.bloodType,
+        theme: result.theme,
+        picture: result.picture,
       },
     });
   } catch (error) {
     res.status(404).json({
       status: "Error",
-      code: 404,
-    });
-  }
-};
-
-// * Done
-const getIngredients = async (req, res, next) => {
-  try {
-    const result = await services.getIngredients();
-    res.json({
-      status: "Success",
-      code: 201,
-      data: result,
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: error.message,
       code: 404,
     });
   }
@@ -147,11 +138,11 @@ const removeAccount = async (req, res, next) => {
   }
 };
 
-// * Done
-const getMeals = async (req, res, next) => {
+// TODO Working
+const getTasks = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
-    const result = await services.getAllMeals(ownerId);
+    const result = await services.getAllTasks(ownerId);
     res.json({
       status: "Success",
       code: 201,
@@ -166,15 +157,14 @@ const getMeals = async (req, res, next) => {
 };
 
 // * Done
-const createMeals = async (req, res, next) => {
+const createBoard = async (req, res, next) => {
   try {
-    const { product, weight, calories, date } = req.body;
-    ownerId = req.user._id;
-    const result = await services.addMeals({
-      product,
-      weight,
-      calories,
-      date,
+    const { title, icon, background } = req.body;
+    const ownerId = req.user._id;
+    const result = await services.addBoard({
+      title,
+      icon,
+      background,
       ownerId,
     });
     res.json({
@@ -191,11 +181,34 @@ const createMeals = async (req, res, next) => {
 };
 
 // * Done
-const removeMeal = async (req, res, next) => {
+const updateBoard = async (req, res, next) => {
   try {
-    ownerId = req.user._id;
-    const { mealId } = req.params;
-    await services.deleteMeal(mealId, ownerId);
+    const { boardId } = req.params;
+    const updatedData = req.body;
+    const result = await services.updateBoard(boardId, updatedData);
+    res.status(201).json({
+      status: "Success",
+      code: 201,
+      data: {
+        title: result.title,
+        icon: result.icon,
+        background: result.background,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "Error",
+      code: 404,
+    });
+  }
+};
+
+// * Done
+const removeBoard = async (req, res, next) => {
+  try {
+    const ownerId = req.user._id;
+    const { boardId } = req.params;
+    await services.deleteBoard(boardId, ownerId);
     res.status(204).json();
   } catch (error) {
     res.status(404).json({
@@ -253,11 +266,11 @@ module.exports = {
   logOutAccount,
   removeAccount,
   updateAccount,
-  getIngredients,
   getCurrentUser,
   verifyEmail,
   verifyResend,
-  getMeals,
-  createMeals,
-  removeMeal,
+  getTasks,
+  createBoard,
+  updateBoard,
+  removeBoard,
 };

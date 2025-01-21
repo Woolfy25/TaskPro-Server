@@ -6,32 +6,41 @@ const {
   logOutAccount,
   removeAccount,
   updateAccount,
-  getMeals,
-  createMeals,
-  removeMeal,
+  getTasks,
+  createBoard,
+  updateBoard,
+  removeBoard,
   getCurrentUser,
   verifyEmail,
   verifyResend,
-  getIngredients,
 } = require("../controllers/controller");
 
 const { auth } = require("../middlewares/auth");
 
-router.get("/account/verify/:verificationToken", verifyEmail); // ! To do
-router.post("/account/verify/", verifyResend); // ! To do
+// Accounts verification
+router.get("/account/verify/:verificationToken", verifyEmail);
+router.post("/account/verify/", verifyResend);
 
-router.get("/account/current", auth, getCurrentUser); // ! To do
-router.delete("/account/logout", auth, logOutAccount); // ! To do
-router.post("/account/register", createAccount); // ! To do
-router.post("/account/login", loginAccount); // ! To do
-router.patch("/account/:accountId", auth, updateAccount); // ! To do
+// Accounts
+router.get("/account/current", auth, getCurrentUser);
+router.delete("/account/logout", auth, logOutAccount);
+router.post("/account/register", createAccount);
+router.post("/account/login", loginAccount);
+router.patch("/account/:accountId", auth, updateAccount);
 
-router.get("/ingredients", auth, getIngredients); // ! To do
+// BOARDS
+router.get("/tasks/board", auth, getTasks); // TODO Working
+router.post("/tasks/board", auth, createBoard);
+router.patch("/tasks/board/:boardId", auth, updateBoard);
+router.delete("/tasks/board/:boardId", auth, removeBoard);
 
-router.get("/meals", auth, getMeals); // ! To do
-router.post("/meals", auth, createMeals); // ! To do
-router.delete("/meals/:mealId", auth, removeMeal); // ! To do
+// COLUMNS
+router.get("/tasks/columns", auth, getTasks); // TODO Working
 
-router.delete("/account/:accountId", auth, removeAccount); // ! To do
+// TASKS
+router.get("/tasks/tasks", auth, getTasks); // TODO Working
+
+// OTHERS
+router.delete("/account/:accountId", auth, removeAccount); // ? NOT IN USE JUST IMPLEMENTED
 
 module.exports = router;
