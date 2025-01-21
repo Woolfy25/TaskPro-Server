@@ -20,6 +20,12 @@ const boards = new Schema({
     type: Schema.Types.ObjectId, // ! CHANGE OWNER
     ref: "User",
   },
+  columns: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Column",
+    },
+  ],
 });
 
 const Boards = mongoose.model("Boards", boards, "boards");

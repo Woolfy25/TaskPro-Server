@@ -1,6 +1,8 @@
 // const mongoose = require("mongoose");
 const User = require("./schemas/Users");
 const Boards = require("./schemas/Board");
+const Columns = require("./schemas/Column");
+const Tasks = require("./schemas/Task");
 const jwt = require("jsonwebtoken");
 const nanoid = require("nanoid");
 const nodemailer = require("nodemailer");
@@ -205,16 +207,28 @@ const deleteBoard = async (boardId, ownerId) => {
 
 // * START COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-const addColumn = async ({ title, ownerId }) => {
-  const board = new Boards({
+// TODO Working
+const addColumn = async ({ title, boardId }) => {
+  const board = await Boards.findById(boardId);
+
+  if (!board) {
+    throw new Error("Board not found!");
+  }
+
+  const column = new Columns({
     title,
-    owner: ownerId,
+    board: boardId,
   });
+
+  await column.save();
+
+  board.columns.push(column._id);
   await board.save();
 
-  return board;
+  return column;
 };
 
+// TODO Working
 const updateColumn = async (columnId, updatedData) => {
   return await Boards.findByIdAndUpdate(
     columnId,
@@ -223,6 +237,7 @@ const updateColumn = async (columnId, updatedData) => {
   );
 };
 
+// TODO Working
 const deleteColumn = async (columnId, ownerId) => {
   const deletedColumn = await Boards.deleteOne({
     _id: columnId,
@@ -239,6 +254,29 @@ const deleteColumn = async (columnId, ownerId) => {
 // * END COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // * START TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// TODO Working
+const addTask = async ({ title, description, columnId }) => {
+  const column = await Columns.findById(columnId);
+
+  if (!column) {
+    throw new Error("Column not found!");
+  }
+
+  const task = new Tasks({
+    title,
+    description,
+    column: columnId,
+  });
+
+  await task.save();
+
+  column.tasks.push(task._id);
+  await column.save();
+
+  return task;
+};
+
 // * END TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 module.exports = {
@@ -256,4 +294,5 @@ module.exports = {
   addColumn,
   updateColumn,
   deleteColumn,
+  addTask,
 };

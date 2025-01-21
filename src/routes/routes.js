@@ -13,6 +13,10 @@ const {
   getCurrentUser,
   verifyEmail,
   verifyResend,
+  createColumn,
+  updateColumn,
+  removeColumn,
+  createTask,
 } = require("../controllers/controller");
 
 const { auth } = require("../middlewares/auth");
@@ -36,12 +40,15 @@ router.delete("/tasks/board/:boardId", auth, removeBoard);
 
 // COLUMNS
 router.get("/tasks/columns", auth, getTasks); // TODO Working
-router.post("/tasks/columns", auth, createBoard);
-router.patch("/tasks/columns/:columnId", auth, updateBoard);
-router.delete("/tasks/columns/:columnId", auth, removeBoard);
+router.post("/tasks/columns", auth, createColumn); // TODO Working
+router.patch("/tasks/columns/", auth, updateColumn); // TODO Working
+router.delete("/tasks/columns/", auth, removeColumn); // TODO Working
 
 // TASKS
 router.get("/tasks/tasks", auth, getTasks); // TODO Working
+router.post("/tasks/tasks", auth, createTask); // TODO Working
+router.patch("/tasks/tasks/", auth, updateColumn); // TODO Working
+router.delete("/tasks/tasks/", auth, removeColumn); // TODO Working
 
 // OTHERS
 router.delete("/account/:accountId", auth, removeAccount); // ? NOT IN USE JUST IMPLEMENTED

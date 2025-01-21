@@ -180,11 +180,11 @@ const verifyResend = async (req, res, next) => {
 const getTasks = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
-    const result = await services.getAllTasks(ownerId);
+    const board = await services.getAllTasks(ownerId);
     res.json({
       status: "Success",
       code: 201,
-      data: result,
+      data: board,
     });
   } catch (error) {
     res.status(404).json({
@@ -198,7 +198,7 @@ const createBoard = async (req, res, next) => {
   try {
     const { title, icon, background } = req.body;
     const ownerId = req.user._id;
-    const result = await services.addBoard({
+    const board = await services.addBoard({
       title,
       icon,
       background,
@@ -207,7 +207,7 @@ const createBoard = async (req, res, next) => {
     res.json({
       status: "Success",
       code: 201,
-      data: result,
+      data: board,
     });
   } catch (error) {
     res.status(404).json({
@@ -221,14 +221,14 @@ const updateBoard = async (req, res, next) => {
   try {
     const { boardId } = req.params;
     const updatedData = req.body;
-    const result = await services.updateBoard(boardId, updatedData);
+    const board = await services.updateBoard(boardId, updatedData);
     res.status(201).json({
       status: "Success",
       code: 201,
       data: {
-        title: result.title,
-        icon: result.icon,
-        background: result.background,
+        title: board.title,
+        icon: board.icon,
+        background: board.background,
       },
     });
   } catch (error) {
@@ -256,37 +256,33 @@ const removeBoard = async (req, res, next) => {
 
 // * START COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-const createColumn = async (req, res, next) => {
+// TODO Working
+const createColumn = async (req, res) => {
   try {
-    const { title } = req.body;
-    const ownerId = req.user._id;
-    const result = await services.addBoard({
-      title,
-      ownerId,
-    });
-    res.json({
+    const { title, boardId } = req.body;
+
+    const column = await services.addColumn({ title, boardId });
+    res.status(201).json({
       status: "Success",
       code: 201,
-      data: result,
+      data: column,
     });
   } catch (error) {
-    res.status(404).json({
-      status: error.message,
-      code: 404,
-    });
+    res.status(400).json({ status: "Error", message: error.message });
   }
 };
 
+// TODO Working
 const updateColumn = async (req, res, next) => {
   try {
     const { columnId } = req.params;
     const updatedData = req.body;
-    const result = await services.updateBoard(columnId, updatedData);
+    const column = await services.updateBoard(columnId, updatedData);
     res.status(201).json({
       status: "Success",
       code: 201,
       data: {
-        title: result.title,
+        title: column.title,
       },
     });
   } catch (error) {
@@ -297,6 +293,7 @@ const updateColumn = async (req, res, next) => {
   }
 };
 
+// TODO Working
 const removeColumn = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
@@ -314,6 +311,23 @@ const removeColumn = async (req, res, next) => {
 // * END COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // * START TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// TODO Working
+const createTask = async (req, res) => {
+  try {
+    const { title, description, columnId } = req.body;
+
+    const task = await services.addTask({ title, description, columnId });
+    res.status(201).json({
+      status: "Success",
+      code: 201,
+      data: task,
+    });
+  } catch (error) {
+    res.status(400).json({ status: "Error", message: error.message });
+  }
+};
+
 // * END TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 module.exports = {
@@ -332,4 +346,5 @@ module.exports = {
   createColumn,
   updateColumn,
   removeColumn,
+  createTask,
 };

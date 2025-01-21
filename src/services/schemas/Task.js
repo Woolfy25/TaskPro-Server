@@ -21,9 +21,10 @@ const tasks = new Schema({
     type: String,
     default: null, // ! CHANGE DEFAULT
   },
-  owner: {
-    type: Schema.Types.ObjectId, // ! CHANGE OWNER
-    ref: "Columns",
+  column: {
+    type: Schema.Types.ObjectId,
+    ref: "Column",
+    required: true,
   },
 });
 
