@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 const User = require("./schemas/Users");
 const Boards = require("./schemas/Board");
 const jwt = require("jsonwebtoken");
@@ -9,7 +9,7 @@ require("dotenv").config();
 const secret = process.env.SECRET;
 const pass = process.env.PASS;
 
-// * Done
+// * START ACCOUNT ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const logOutAccount = async (userId) => {
   const user = await User.findById(userId);
   if (!user) {
@@ -21,7 +21,6 @@ const logOutAccount = async (userId) => {
   return userId;
 };
 
-// * Done
 const createAccount = async ({ email, name, password }) => {
   const userExistent = await User.findOne({ email });
   if (userExistent) {
@@ -77,7 +76,6 @@ const createAccount = async ({ email, name, password }) => {
   return await savedUser.save();
 };
 
-// * Done
 const checkUserDB = async ({ email, password }) => {
   const user = await User.findOne({ email });
   if (!user || !user.validPassword(password)) {
@@ -106,7 +104,6 @@ const checkUserDB = async ({ email, password }) => {
   return await user.save();
 };
 
-// * Done
 const updateAccount = async (accountId, updatedData) => {
   return await User.findByIdAndUpdate(
     accountId,
@@ -115,53 +112,10 @@ const updateAccount = async (accountId, updatedData) => {
   );
 };
 
-// * Done
 const deleteAccount = async (accountId) => {
   return User.deleteOne({ _id: accountId });
 };
 
-// TODO Working
-const getAllTasks = async (ownerId) => {
-  return Boards.find({ owner: ownerId });
-};
-
-// * Done
-const addBoard = async ({ title, icon, background, ownerId }) => {
-  const board = new Boards({
-    title,
-    icon,
-    background,
-    owner: ownerId,
-  });
-  await board.save();
-
-  return board;
-};
-
-// * Done
-const updateBoard = async (boardId, updatedData) => {
-  return await Boards.findByIdAndUpdate(
-    boardId,
-    { $set: updatedData },
-    { new: true }
-  );
-};
-
-// * Done
-const deleteBoard = async (boardId, ownerId) => {
-  const deletedBoard = await Boards.deleteOne({
-    _id: boardId,
-    owner: ownerId,
-  });
-
-  if (deletedBoard.deletedCount === 0) {
-    throw new Error("Contact not found or you don't have permission to delete");
-  }
-
-  return deletedBoard;
-};
-
-// * Done
 const verifyEmailAddress = async (verificationToken) => {
   const update = { verify: true, verificationToken: null };
 
@@ -176,7 +130,6 @@ const verifyEmailAddress = async (verificationToken) => {
   if (!result) throw new Error("User does not exist!");
 };
 
-// * Done
 const verifyEmailResend = async (email) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error("User does not exist!");
@@ -207,6 +160,86 @@ const verifyEmailResend = async (email) => {
     console.log("Email sent: " + info.response);
   });
 };
+// * END ACCOUNT ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// * START BOARD ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// TODO Working
+const getAllTasks = async (ownerId) => {
+  return Boards.find({ owner: ownerId });
+};
+
+const addBoard = async ({ title, icon, background, ownerId }) => {
+  const board = new Boards({
+    title,
+    icon,
+    background,
+    owner: ownerId,
+  });
+  await board.save();
+
+  return board;
+};
+
+const updateBoard = async (boardId, updatedData) => {
+  return await Boards.findByIdAndUpdate(
+    boardId,
+    { $set: updatedData },
+    { new: true }
+  );
+};
+
+const deleteBoard = async (boardId, ownerId) => {
+  const deletedBoard = await Boards.deleteOne({
+    _id: boardId,
+    owner: ownerId,
+  });
+
+  if (deletedBoard.deletedCount === 0) {
+    throw new Error("Contact not found or you don't have permission to delete");
+  }
+
+  return deletedBoard;
+};
+// * END BOARD ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// * START COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+const addColumn = async ({ title, ownerId }) => {
+  const board = new Boards({
+    title,
+    owner: ownerId,
+  });
+  await board.save();
+
+  return board;
+};
+
+const updateColumn = async (columnId, updatedData) => {
+  return await Boards.findByIdAndUpdate(
+    columnId,
+    { $set: updatedData },
+    { new: true }
+  );
+};
+
+const deleteColumn = async (columnId, ownerId) => {
+  const deletedColumn = await Boards.deleteOne({
+    _id: columnId,
+    owner: ownerId,
+  });
+
+  if (deletedColumn.deletedCount === 0) {
+    throw new Error("Contact not found or you don't have permission to delete");
+  }
+
+  return deletedColumn;
+};
+
+// * END COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// * START TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// * END TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 module.exports = {
   createAccount,
@@ -220,4 +253,7 @@ module.exports = {
   addBoard,
   updateBoard,
   deleteBoard,
+  addColumn,
+  updateColumn,
+  deleteColumn,
 };

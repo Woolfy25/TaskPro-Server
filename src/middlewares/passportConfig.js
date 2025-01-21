@@ -19,7 +19,7 @@ passport.use(
     User.find({ email: payload.email })
       .then(([user]) => {
         if (!user) {
-          return done(new Error("User-ul nu exista!"));
+          return done(new Error("User does not exist!"));
         }
         return done(null, user);
       })

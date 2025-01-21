@@ -36,6 +36,9 @@ router.delete("/tasks/board/:boardId", auth, removeBoard);
 
 // COLUMNS
 router.get("/tasks/columns", auth, getTasks); // TODO Working
+router.post("/tasks/columns", auth, createBoard);
+router.patch("/tasks/columns/:columnId", auth, updateBoard);
+router.delete("/tasks/columns/:columnId", auth, removeBoard);
 
 // TASKS
 router.get("/tasks/tasks", auth, getTasks); // TODO Working

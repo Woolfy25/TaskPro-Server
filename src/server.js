@@ -10,11 +10,11 @@ const DB_URL = process.env.DB_URL;
 mongoose
   .connect(DB_URL)
   .then(() => {
-    console.log("Serverul TASK PRO ruleaza!");
+    console.log("Server TASK PRO is running!");
     app.listen(PORT, () => {
       console.log(`Server TASK PRO is running. Use our API on port: ${PORT}`);
     });
   })
   .catch((error) => {
-    console.log("Serverul TASK PRO nu ruleaza! Erroare:", error.message);
+    console.log("SErver TASK PRO is not running! Error:", error.message);
   });
