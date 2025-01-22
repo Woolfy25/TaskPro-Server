@@ -23,7 +23,7 @@ const boards = new Schema({
   columns: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Column",
+      ref: "Columns",
     },
   ],
 });

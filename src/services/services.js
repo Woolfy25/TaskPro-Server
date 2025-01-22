@@ -166,9 +166,15 @@ const verifyEmailResend = async (email) => {
 
 // * START BOARD ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO Working
 const getAllTasks = async (ownerId) => {
-  return Boards.find({ owner: ownerId });
+  return Boards.find({ owner: ownerId })
+    .populate({
+      path: "columns",
+      populate: {
+        path: "tasks",
+      },
+    })
+    .exec();
 };
 
 const addBoard = async ({ title, icon, background, ownerId }) => {
@@ -207,7 +213,6 @@ const deleteBoard = async (boardId, ownerId) => {
 
 // * START COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO Working
 const addColumn = async ({ title, boardId }) => {
   const board = await Boards.findById(boardId);
 
@@ -228,20 +233,17 @@ const addColumn = async ({ title, boardId }) => {
   return column;
 };
 
-// TODO Working
 const updateColumn = async (columnId, updatedData) => {
-  return await Boards.findByIdAndUpdate(
+  return await Columns.findByIdAndUpdate(
     columnId,
     { $set: updatedData },
     { new: true }
   );
 };
 
-// TODO Working
-const deleteColumn = async (columnId, ownerId) => {
-  const deletedColumn = await Boards.deleteOne({
+const deleteColumn = async (columnId) => {
+  const deletedColumn = await Columns.deleteOne({
     _id: columnId,
-    owner: ownerId,
   });
 
   if (deletedColumn.deletedCount === 0) {
@@ -255,7 +257,6 @@ const deleteColumn = async (columnId, ownerId) => {
 
 // * START TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO Working
 const addTask = async ({ title, description, columnId }) => {
   const column = await Columns.findById(columnId);
 
@@ -277,6 +278,26 @@ const addTask = async ({ title, description, columnId }) => {
   return task;
 };
 
+const updateTask = async (taskId, updatedData) => {
+  return await Tasks.findByIdAndUpdate(
+    taskId,
+    { $set: updatedData },
+    { new: true }
+  );
+};
+
+const deleteTask = async (taskId) => {
+  const deletedColumn = await Tasks.deleteOne({
+    _id: taskId,
+  });
+
+  if (deletedColumn.deletedCount === 0) {
+    throw new Error("Contact not found or you don't have permission to delete");
+  }
+
+  return deletedColumn;
+};
+
 // * END TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 module.exports = {
@@ -295,4 +316,6 @@ module.exports = {
   updateColumn,
   deleteColumn,
   addTask,
+  updateTask,
+  deleteTask,
 };

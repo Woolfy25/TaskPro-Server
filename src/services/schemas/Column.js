@@ -16,7 +16,7 @@ const column = new Schema({
   tasks: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Task",
+      ref: "Tasks",
     },
   ],
 });

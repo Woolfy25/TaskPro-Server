@@ -17,6 +17,8 @@ const {
   updateColumn,
   removeColumn,
   createTask,
+  updateTask,
+  removeTask,
 } = require("../controllers/controller");
 
 const { auth } = require("../middlewares/auth");
@@ -32,23 +34,23 @@ router.post("/account/register", createAccount);
 router.post("/account/login", loginAccount);
 router.patch("/account/:accountId", auth, updateAccount);
 
+// GET ALL TASKS COLUMNS AND BOARDS
+router.get("/tasks", auth, getTasks);
+
 // BOARDS
-router.get("/tasks/board", auth, getTasks); // TODO Working
 router.post("/tasks/board", auth, createBoard);
 router.patch("/tasks/board/:boardId", auth, updateBoard);
 router.delete("/tasks/board/:boardId", auth, removeBoard);
 
 // COLUMNS
-router.get("/tasks/columns", auth, getTasks); // TODO Working
-router.post("/tasks/columns", auth, createColumn); // TODO Working
-router.patch("/tasks/columns/", auth, updateColumn); // TODO Working
-router.delete("/tasks/columns/", auth, removeColumn); // TODO Working
+router.post("/tasks/columns", auth, createColumn);
+router.patch("/tasks/columns", auth, updateColumn);
+router.delete("/tasks/columns/:columnId", auth, removeColumn);
 
 // TASKS
-router.get("/tasks/tasks", auth, getTasks); // TODO Working
-router.post("/tasks/tasks", auth, createTask); // TODO Working
-router.patch("/tasks/tasks/", auth, updateColumn); // TODO Working
-router.delete("/tasks/tasks/", auth, removeColumn); // TODO Working
+router.post("/tasks/tasks", auth, createTask);
+router.patch("/tasks/tasks", auth, updateTask);
+router.delete("/tasks/tasks/:taskId", auth, removeTask);
 
 // OTHERS
 router.delete("/account/:accountId", auth, removeAccount); // ? NOT IN USE JUST IMPLEMENTED

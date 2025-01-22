@@ -176,15 +176,14 @@ const verifyResend = async (req, res, next) => {
 
 // * START BOARD ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO Working
 const getTasks = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
-    const board = await services.getAllTasks(ownerId);
+    const boardItems = await services.getAllTasks(ownerId);
     res.json({
       status: "Success",
       code: 201,
-      data: board,
+      data: boardItems,
     });
   } catch (error) {
     res.status(404).json({
@@ -256,7 +255,6 @@ const removeBoard = async (req, res, next) => {
 
 // * START COLUMN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO Working
 const createColumn = async (req, res) => {
   try {
     const { title, boardId } = req.body;
@@ -272,12 +270,10 @@ const createColumn = async (req, res) => {
   }
 };
 
-// TODO Working
 const updateColumn = async (req, res, next) => {
   try {
-    const { columnId } = req.params;
-    const updatedData = req.body;
-    const column = await services.updateBoard(columnId, updatedData);
+    const { columnId, ...updatedData } = req.body;
+    const column = await services.updateColumn(columnId, updatedData);
     res.status(201).json({
       status: "Success",
       code: 201,
@@ -287,18 +283,17 @@ const updateColumn = async (req, res, next) => {
     });
   } catch (error) {
     res.status(404).json({
-      status: "Error",
+      status: error.message,
       code: 404,
     });
   }
 };
 
-// TODO Working
 const removeColumn = async (req, res, next) => {
   try {
-    const ownerId = req.user._id;
     const { columnId } = req.params;
-    await services.deleteBoard(columnId, ownerId);
+
+    await services.deleteColumn(columnId);
     res.status(204).json();
   } catch (error) {
     res.status(404).json({
@@ -312,7 +307,6 @@ const removeColumn = async (req, res, next) => {
 
 // * START TASKS ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO Working
 const createTask = async (req, res) => {
   try {
     const { title, description, columnId } = req.body;
@@ -325,6 +319,42 @@ const createTask = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ status: "Error", message: error.message });
+  }
+};
+
+const updateTask = async (req, res, next) => {
+  try {
+    const { taskId, ...updatedData } = req.body;
+    const task = await services.updateTask(taskId, updatedData);
+    res.status(201).json({
+      status: "Success",
+      code: 201,
+      data: {
+        title: task.title,
+        description: task.description,
+        color: task.color,
+        date: task.date,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: error.message,
+      code: 404,
+    });
+  }
+};
+
+const removeTask = async (req, res, next) => {
+  try {
+    const { taskId } = req.params;
+
+    await services.deleteTask(taskId);
+    res.status(204).json();
+  } catch (error) {
+    res.status(404).json({
+      status: error.message,
+      code: 404,
+    });
   }
 };
 
@@ -347,4 +377,6 @@ module.exports = {
   updateColumn,
   removeColumn,
   createTask,
+  updateTask,
+  removeTask,
 };
