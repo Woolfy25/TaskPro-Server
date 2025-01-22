@@ -17,7 +17,7 @@ const boards = new Schema({
     default: null, // ! CHANGE DEFAULT
   },
   owner: {
-    type: Schema.Types.ObjectId, // ! CHANGE OWNER
+    type: Schema.Types.ObjectId, // TODO CHANGE OWNER
     ref: "User",
   },
   columns: [
