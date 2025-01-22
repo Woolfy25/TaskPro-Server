@@ -43,7 +43,7 @@ const createAccount = async ({ email, name, password }) => {
     from: "ramonspuci@gmail.com",
     to: `${email}`,
     subject: "Verification email Task Pro account.",
-    text: `Your account verification code is: ${uniqueValidationCode}, http://localhost:3000/taskpro/account/verify/${uniqueValidationCode}`, // ! change to website URL
+    text: `Your account verification code is: ${uniqueValidationCode}, https://taskpro-server.onrender.com/taskpro/account/verify/${uniqueValidationCode}`, // ! change to website URL
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -152,7 +152,7 @@ const verifyEmailResend = async (email) => {
     from: "ramonspuci@gmail.com",
     to: `${email}`,
     subject: "Verification email Task Pro account.",
-    text: `Your account verification code is: ${uniqueValidationCode}, http://localhost:3000/taskpro/account/verify/${uniqueValidationCode}`, // ! change to website URL
+    text: `Your account verification code is: ${uniqueValidationCode}, https://taskpro-server.onrender.com/taskpro/account/verify/${uniqueValidationCode}`, // ! change to website URL
   };
 
   transporter.sendMail(mailOptions, (error, info) => {

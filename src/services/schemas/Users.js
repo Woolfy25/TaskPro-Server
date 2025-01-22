@@ -21,11 +21,11 @@ const user = new Schema({
   },
   picture: {
     type: String,
-    default: null,
+    default: null, // TODO Implement Picture
   },
   theme: {
     type: String,
-    default: null,
+    default: "Light",
   },
   token: {
     type: String,

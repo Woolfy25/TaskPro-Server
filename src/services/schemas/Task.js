@@ -15,11 +15,11 @@ const tasks = new Schema({
   },
   color: {
     type: String,
-    default: null, // ! CHANGE DEFAULT
+    default: null,
   },
   date: {
     type: String,
-    default: null, // ! CHANGE DEFAULT
+    default: null,
   },
   column: {
     type: Schema.Types.ObjectId,

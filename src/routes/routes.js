@@ -25,7 +25,7 @@ const { auth } = require("../middlewares/auth");
 
 // Accounts verification
 router.get("/account/verify/:verificationToken", verifyEmail);
-router.post("/account/verify/", verifyResend);
+router.post("/account/verify", verifyResend);
 
 // Accounts
 router.get("/account/current", auth, getCurrentUser);
